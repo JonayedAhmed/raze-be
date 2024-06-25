@@ -1,37 +1,51 @@
 // external imports
 const express = require('express');
-const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 // internal imports
 const { notFoundHandler, errorHandler } = require('./middlewares/common/errorHandler');
-const loginRouter = require("./router/loginRouter");
+const accountRouter = require('./router/accountRouter');
+const { mongoConnectionString, cookieSecret } = require('./config/config');
+const logger = require('./utils/logger');
 
 const app = express();
-dotenv.config();
 
-// database connection
-mongoose.connect(process.env.MONGO_CONNECTION_STRING)
-    .then(() => console.log('Database connection successful!'))
-    .catch(err => console.log(err));
+// Security middleware
+app.use(helmet());
 
-// request parsers
+// Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
+
+// Request parsers
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// parse cookies
-app.use(cookieParser(process.env.COOKIE_SECRET));
+// Parse cookies
+app.use(cookieParser(cookieSecret));
 
-// routing setup
-app.use("/", loginRouter);
+// Use logger in middlewares
+app.use((req, res, next) => {
+    logger.info(`${req.method} ${req.url}`);
+    next();
+});
+
+// Routing setup
+app.get("/", (req, res) => {
+    res.json({ data: `${Date()} - Backend is running` });
+})
+app.use("/account", accountRouter);
 
 // 404 not found handler
 app.use(notFoundHandler);
 
-// common error handler
+// Common error handler
 app.use(errorHandler);
 
-app.listen(process.env.PORT, () => {
-    console.log(`app listening to port ${process.env.PORT}`);
-})
+module.exports = app;
