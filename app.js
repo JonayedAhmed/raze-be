@@ -1,10 +1,8 @@
 // external imports
 const express = require('express');
-const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const fs = require('fs');
 const path = require('path');
 
 // internal imports
@@ -31,18 +29,6 @@ app.use(express.urlencoded({ extended: true }));
 
 // Parse cookies
 app.use(cookieParser(cookieSecret));
-
-// Ensure upload directories exist
-const userImagesDir = path.join(__dirname, 'uploads/userImages');
-const productImagesDir = path.join(__dirname, 'uploads/productImages');
-
-if (!fs.existsSync(userImagesDir)) {
-    fs.mkdirSync(userImagesDir, { recursive: true });
-}
-
-if (!fs.existsSync(productImagesDir)) {
-    fs.mkdirSync(productImagesDir, { recursive: true });
-}
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
