@@ -5,73 +5,6 @@ const { jwtSecret } = require('../config/config');
 const { uploadSingle } = require('../utils/helper');
 
 
-// SIGNUP
-exports.registerUser = async (req, res) => {
-
-    const { userName, password } = req.body;
-
-    if (!userName || !password) {
-        return res.status(400).json({ message: 'User name and password are required' });
-    }
-
-    try {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
-
-        const newUser = new User({
-            userName,
-            name: req.body.name,
-            password: hashedPassword,
-            email: req.body.email,
-            address: req.body.address || '',
-            phone: req.body.phone
-        });
-
-        await newUser.save();
-        res.status(201).json({ message: 'User registered successfully' });
-    } catch (error) {
-        res.status(500).json({ message: 'An error occurred during registration', error: error.message });
-    }
-};
-
-
-// UPDATE USER
-exports.updateUser = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const file = await uploadSingle('userImage')(req, res);
-
-        const updateData = {
-            userName: req.body.userName,
-            name: req.body.name,
-            email: req.body.email,
-            address: req.body.address,
-            phone: req.body.phone,
-            role: req.body.role,
-            permissions: req.body.permissions,
-        };
-
-        if (file) {
-            updateData.userImage = file.path.replace(/\\/g, '/'); // Normalize path
-        }
-
-        const user = await User.findByIdAndUpdate(id, updateData, { new: true });
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        res.status(200).json(user);
-    } catch (error) {
-        if (error.message.includes('MulterError')) {
-            res.status(400).json({ message: 'File upload error', error: error.message });
-        } else {
-            res.status(500).json({ message: 'An error occurred during the update', error: error.message });
-        }
-    }
-};
-
 // LOGIN
 exports.userLogin = async (req, res) => {
     const { userName, password } = req.body;
@@ -110,6 +43,73 @@ exports.userLogin = async (req, res) => {
     }
 };
 
+// SIGNUP
+exports.registerUser = async (req, res) => {
+
+    const { userName, password } = req.body;
+
+    if (!userName || !password) {
+        return res.status(400).json({ message: 'User name and password are required' });
+    }
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new User({
+            userName,
+            name: req.body.name,
+            password: hashedPassword,
+            email: req.body.email,
+            address: req.body.address || '',
+            phone: req.body.phone
+        });
+
+        await newUser.save();
+        res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred during registration', error: error.message });
+    }
+};
+
+// UPDATE USER
+exports.updateUser = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const file = await uploadSingle('userImage')(req, res);
+
+        const updateData = {
+            userName: req.body.userName,
+            name: req.body.name,
+            email: req.body.email,
+            address: req.body.address,
+            phone: req.body.phone,
+            role: req.body.role,
+            permissions: req.body.permissions,
+        };
+
+        if (file) {
+            updateData.userImage = file.path.replace(/\\/g, '/'); // Normalize path
+        }
+
+        const user = await User.findByIdAndUpdate(id, updateData, { new: true });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        if (error.message.includes('MulterError')) {
+            res.status(400).json({ message: 'File upload error', error: error.message });
+        } else {
+            res.status(500).json({ message: 'An error occurred during the update', error: error.message });
+        }
+    }
+};
+
+
 // GET USER
 exports.getUser = async (req, res) => {
     const { id } = req.params;
@@ -121,7 +121,7 @@ exports.getUser = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({ user });
+        res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: 'An error occurred while fetching the user data', error: error.message });
     }
