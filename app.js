@@ -4,6 +4,7 @@ const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const cors = require('cors'); // Import the cors package
 
 // internal imports
 const { notFoundHandler, errorHandler } = require('./middlewares/common/errorHandler');
@@ -12,6 +13,9 @@ const { mongoConnectionString, cookieSecret } = require('./config/config');
 const logger = require('./utils/logger');
 
 const app = express();
+
+// Enable CORS for all routes
+app.use(cors());
 
 // Security middleware
 app.use(helmet());
@@ -40,10 +44,10 @@ app.use((req, res, next) => {
 });
 
 // Routing setup
-app.all("/", (req, res) => {
+app.all("/raze", (req, res) => {
     res.json({ data: `${Date()} - Backend is running` });
 })
-app.use("/account", accountRouter);
+app.use("/raze/account", accountRouter);
 
 // 404 not found handler
 app.use(notFoundHandler);

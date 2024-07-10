@@ -7,16 +7,16 @@ const { uploadSingle } = require('../utils/helper');
 
 // LOGIN
 exports.userLogin = async (req, res) => {
-    const { userName, password } = req.body;
+    const { email, password } = req.body;
 
     // Validate input
-    if (!userName || !password) {
-        return res.status(400).json({ message: 'User name and password are required' });
+    if (!email || !password) {
+        return res.status(400).json({ message: 'User email and password are required' });
     }
 
     try {
         // Check if the user exists
-        const user = await User.findOne({ userName });
+        const user = await User.findOne({ email });
         if (!user) {
             return res.status(401).json({ message: 'Invalid credentials' });
         }
@@ -30,13 +30,23 @@ exports.userLogin = async (req, res) => {
 
         // generate token
         const token = jwt.sign({
-            userName,
+            fullName: user.fullName,
             id: user._id
         }, jwtSecret, {
             expiresIn: '7d'
         });
 
-        res.status(200).json({ message: 'login successful', accessToken: token });
+        const responseBody = {
+            fullName: user.fullName,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            userImage: user.userImage,
+            permissions: user.permissions,
+            jwtToken: token
+        }
+
+        res.status(200).json(responseBody);
     } catch (error) {
         // Handle any errors that occur during login
         res.status(500).json({ message: 'An error occurred during login', error: error.message });
@@ -46,10 +56,10 @@ exports.userLogin = async (req, res) => {
 // SIGNUP
 exports.registerUser = async (req, res) => {
 
-    const { userName, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!userName || !password) {
-        return res.status(400).json({ message: 'User name and password are required' });
+    if (!email || !password) {
+        return res.status(400).json({ message: 'Email and password are required' });
     }
 
     try {
@@ -57,8 +67,7 @@ exports.registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = new User({
-            userName,
-            name: req.body.name,
+            fullName: req.body.fullName,
             password: hashedPassword,
             email: req.body.email,
             address: req.body.address || '',
@@ -80,8 +89,7 @@ exports.updateUser = async (req, res) => {
         const file = await uploadSingle('userImage')(req, res);
 
         const updateData = {
-            userName: req.body.userName,
-            name: req.body.name,
+            fullName: req.body.fullName,
             email: req.body.email,
             address: req.body.address,
             phone: req.body.phone,
@@ -108,7 +116,6 @@ exports.updateUser = async (req, res) => {
         }
     }
 };
-
 
 // GET USER
 exports.getUser = async (req, res) => {
