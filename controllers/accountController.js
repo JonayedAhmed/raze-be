@@ -1,8 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../schemas/userSchema');
-const { jwtSecret } = require('../config/config');
+
 const { uploadSingle } = require('../utils/helper');
+const { jwtSecret } = require('../config/config');
 
 
 // LOGIN
@@ -30,6 +31,7 @@ exports.userLogin = async (req, res) => {
 
         // generate token
         const token = jwt.sign({
+            role: user.role,
             fullName: user.fullName,
             id: user._id
         }, jwtSecret, {
@@ -131,5 +133,15 @@ exports.getUser = async (req, res) => {
         res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ message: 'An error occurred while fetching the user data', error: error.message });
+    }
+};
+
+// Get ALL USER
+exports.getAllUser = async (req, res) => {
+    try {
+        const users = await User.find({}, { password: 0 });
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: 'An error occurred while fetching the users', error: error.message });
     }
 };
