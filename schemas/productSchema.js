@@ -5,11 +5,16 @@ const productSchema = new Schema({
     name: { type: String, required: true },
     description: { type: String, required: true },
     price: { type: Number, required: true },
-    segment: { type: Schema.Types.ObjectId, ref: 'Segment' },
-    subSegment: { type: Schema.Types.ObjectId, ref: 'SubSegment' },
-    inventory: { type: Schema.Types.ObjectId, ref: 'Inventory' },
+    discountedPrice: { type: Number },
+    segment: { type: Schema.Types.ObjectId, ref: 'Segment', required: true },
+    subSegment: { type: Schema.Types.ObjectId, ref: 'SubSegment', required: true },
+    sizes: [{
+        size: { type: String, required: true },
+        quantity: { type: Number, required: true, default: 0 }
+    }],
+    threshold: { type: Number, default: 0 },
+    createdAt: { type: Date, default: Date.now },
     images: [{ type: String }],
-    createdAt: { type: Date, default: Date.now }
 });
 
 module.exports = mongoose.model('Product', productSchema);

@@ -55,7 +55,7 @@ exports.userLogin = async (req, res) => {
     }
 };
 
-// SIGNUP
+// REGISTER
 exports.registerUser = async (req, res) => {
 
     const { email, password } = req.body;
@@ -91,12 +91,12 @@ exports.updateUser = async (req, res) => {
         const file = await uploadSingle('userImage')(req, res);
 
         const updateData = {
-            fullName: req.body.fullName,
-            email: req.body.email,
-            address: req.body.address,
-            phone: req.body.phone,
-            role: req.body.role,
-            permissions: req.body.permissions,
+            fullName: req.body.user.fullName,
+            email: req.body.user.email,
+            address: req.body.user.address,
+            phone: req.body.user.phone,
+            role: req.body.user.role,
+            permissions: req.body.user.permissions || [],
         };
 
         if (file) {

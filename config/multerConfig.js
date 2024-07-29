@@ -7,8 +7,11 @@ const storage = multer.diskStorage({
     destination: function (req, file, cb) {
 
         // Ensure upload directories exist
+        // TODO: code below is not working, need to update check and create existing directory
+        /*
         const userImagesDir = path.join(__dirname, 'uploads/userImages');
         const productImagesDir = path.join(__dirname, 'uploads/productImages');
+        const bannersDir = path.join(__dirname, 'uploads/banners');
 
         if (!fs.existsSync(userImagesDir)) {
             fs.mkdirSync(userImagesDir, { recursive: true });
@@ -18,12 +21,19 @@ const storage = multer.diskStorage({
             fs.mkdirSync(productImagesDir, { recursive: true });
         }
 
+        if (!fs.existsSync(bannersDir)) {
+            fs.mkdirSync(bannersDir, { recursive: true });
+        }
+            */
+
         // Set upload path
         let uploadPath = 'uploads/';
         if (file.fieldname === 'userImage') {
             uploadPath += 'userImages/';
         } else if (file.fieldname === 'productImage') {
             uploadPath += 'productImages/';
+        } else if (file.fieldname === 'banner') {
+            uploadPath += 'banners/';
         }
         cb(null, uploadPath); // Set the destination folder dynamically
     },

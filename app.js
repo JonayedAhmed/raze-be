@@ -9,6 +9,8 @@ const cors = require('cors'); // Import the cors package
 // internal imports
 const { notFoundHandler, errorHandler } = require('./middlewares/common/errorHandler');
 const accountRouter = require('./router/accountRouter');
+const segmentRouter = require('./router/segmentRouter');
+const subSegmentRouter = require('./router/subSegmentRouter');
 const { mongoConnectionString, cookieSecret } = require('./config/config');
 const logger = require('./utils/logger');
 
@@ -48,6 +50,8 @@ app.all("/raze", (req, res) => {
     res.json({ data: `${Date()} - Backend is running` });
 })
 app.use("/raze/account", accountRouter);
+app.use("/raze/segment", segmentRouter);
+app.use("/raze/subsegment", subSegmentRouter);
 
 // 404 not found handler
 app.use(notFoundHandler);

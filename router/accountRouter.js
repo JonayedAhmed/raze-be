@@ -20,6 +20,6 @@ router.put("/:id/update", verifyToken, accountController.updateUser);
 router.get("/:id", verifyToken, accountController.getUser);
 
 // fetch all user data
-router.get("/users/all", verifyToken, isAdmin, accountController.getAllUser);
+router.get("/all", verifyToken, isAdmin, accountController.getAllUser);
 
 module.exports = router;
